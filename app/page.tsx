@@ -88,7 +88,7 @@ export default function Home() {
   }
 
   const topPlayers = leaderboard.slice(0, 5);
-  const allPlayers = Object.values(playerStats).sort((a, b) => b.total_hours - a.total_hours);
+  const allPlayers = Object.values(playerStats).sort((a: PlayerStats, b: PlayerStats) => b.total_hours - a.total_hours);
 
   return (
     <Box style={{ minHeight: '100vh' }}>
@@ -201,7 +201,7 @@ export default function Home() {
                 <Text c="dimmed">No players currently online</Text>
               ) : (
                 <Stack gap="sm">
-                  {onlinePlayers.map((player, idx) => (
+                  {onlinePlayers.map((player: OnlinePlayer, idx: number) => (
                     <Card key={idx} padding="md" radius="sm" withBorder>
                       <Group justify="space-between">
                         <Stack gap={2}>
@@ -234,7 +234,7 @@ export default function Home() {
                 <Text c="dimmed">No player data available</Text>
               ) : (
                 <Stack gap="sm">
-                  {topPlayers.map((player, idx) => (
+                  {topPlayers.map((player: LeaderboardEntry, idx: number) => (
                     <Card key={idx} padding="md" radius="sm" withBorder>
                       <Group justify="space-between">
                         <Group>
@@ -279,7 +279,7 @@ export default function Home() {
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {allPlayers.map((player, idx) => (
+              {allPlayers.map((player: PlayerStats, idx: number) => (
                 <Table.Tr key={idx}>
                   <Table.Td>
                     <Text fw={500}>{player.username}</Text>
