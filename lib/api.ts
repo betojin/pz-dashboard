@@ -5,7 +5,7 @@
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const FALLBACK_URL = process.env.NEXT_PUBLIC_DATA_REPO_URL;
-const API_TIMEOUT = 3000; // 3 seconds
+const API_TIMEOUT = 10000; // 10 seconds
 
 interface FetchResult<T> {
     data: T | null;
