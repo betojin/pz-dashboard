@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-
-const inter = Inter({ subsets: ['latin'] })
+import { MantineProvider, ColorSchemeScript } from '@mantine/core'
+import '@mantine/core/styles.css'
 
 export const metadata: Metadata = {
   title: 'Camp Crew PZ - Server Dashboard',
@@ -16,7 +14,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <head>
+        <ColorSchemeScript defaultColorScheme="dark" />
+      </head>
+      <body>
+        <MantineProvider defaultColorScheme="dark">
+          {children}
+        </MantineProvider>
+      </body>
     </html>
   )
 }

@@ -1,6 +1,30 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { 
+    Container, 
+    Title, 
+    Text, 
+    Grid, 
+    Card, 
+    Badge,
+    Table,
+    Stack,
+    Group,
+    Paper,
+    Box,
+    Avatar,
+    Indicator,
+    Divider
+} from '@mantine/core';
+import { 
+    IconUsers, 
+    IconDeviceGamepad2, 
+    IconMap, 
+    IconSwords,
+    IconTrophy,
+    IconClock
+} from '@tabler/icons-react';
 import {
   fetchServerStatus,
   fetchOnlinePlayers,
@@ -24,8 +48,6 @@ export default function Home() {
 
   useEffect(() => {
     loadData();
-    
-    // Refresh every 30 seconds
     const interval = setInterval(loadData, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -66,206 +88,229 @@ export default function Home() {
   }
 
   const topPlayers = leaderboard.slice(0, 5);
+  const allPlayers = Object.values(playerStats).sort((a, b) => b.total_hours - a.total_hours);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+    <Box style={{ minHeight: '100vh' }}>
       {/* Header */}
-      <header className="bg-black/30 backdrop-blur-sm border-b border-gray-700">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-green-400">
+      <Paper p="xl" radius={0} withBorder>
+        <Container size="xl">
+          <Group justify="space-between" align="flex-start">
+            <Stack gap="xs">
+              <Title order={1} c="green">
                 {serverStatus?.server_name || 'PZ Server'}
-              </h1>
-              <p className="text-gray-400 mt-1">
+              </Title>
+              <Text c="dimmed">
                 {serverStatus?.description || 'Project Zomboid Server Dashboard'}
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="flex items-center gap-2 justify-end mb-1">
-                <div className={`w-3 h-3 rounded-full ${serverStatus?.online ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-                <span className="text-sm font-medium">
+              </Text>
+            </Stack>
+            <Stack gap="xs" align="flex-end">
+              <Group gap="xs">
+                <Indicator 
+                  color={serverStatus?.online ? 'green' : 'red'} 
+                  processing={serverStatus?.online}
+                  size={12}
+                />
+                <Text fw={500}>
                   {serverStatus?.online ? 'Online' : 'Offline'}
-                </span>
-              </div>
-              <div className="text-xs text-gray-400">
+                </Text>
+              </Group>
+              <Text size="xs" c="dimmed">
                 {dataSource === 'api' ? '🟢 Live Data' : '🟡 Cached Data'} • Updated {lastUpdate}
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+              </Text>
+            </Stack>
+          </Group>
+        </Container>
+      </Paper>
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <StatCard
-            title="Players Online"
-            value={`${serverStatus?.current_players || 0} / ${serverStatus?.max_players || 0}`}
-            icon="👥"
-            color="bg-blue-500/20 border-blue-500/50"
-          />
-          <StatCard
-            title="Total Players"
-            value={Object.keys(playerStats).length}
-            icon="🎮"
-            color="bg-purple-500/20 border-purple-500/50"
-          />
-          <StatCard
-            title="Map"
-            value={serverStatus?.map || 'Unknown'}
-            icon="🗺️"
-            color="bg-green-500/20 border-green-500/50"
-          />
-          <StatCard
-            title="PVP Mode"
-            value={serverStatus?.pvp_enabled ? 'Enabled' : 'Disabled'}
-            icon="⚔️"
-            color="bg-red-500/20 border-red-500/50"
-          />
-        </div>
+      {/* Main Content */}
+      <Container size="xl" py="xl">
+        {/* Stats Cards */}
+        <Grid mb="xl">
+          <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Group justify="space-between">
+                <Stack gap={5}>
+                  <Text size="sm" c="dimmed">Players Online</Text>
+                  <Text size="xl" fw={700}>
+                    {serverStatus?.current_players || 0} / {serverStatus?.max_players || 0}
+                  </Text>
+                </Stack>
+                <Avatar color="blue" radius="xl" size="lg">
+                  <IconUsers size={24} />
+                </Avatar>
+              </Group>
+            </Card>
+          </Grid.Col>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Online Players */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6">
-            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-              <span className="text-green-400">🟢</span> Online Players
-            </h2>
-            {onlinePlayers.length === 0 ? (
-              <p className="text-gray-400">No players currently online</p>
-            ) : (
-              <div className="space-y-3">
-                {onlinePlayers.map((player, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-gray-900/50 rounded-lg p-4 border border-gray-700 hover:border-green-500/50 transition"
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="font-semibold text-lg">{player.username}</div>
-                        <div className="text-sm text-gray-400">
-                          Connected: {new Date(player.connected_at).toLocaleTimeString()}
-                        </div>
-                      </div>
-                      {player.x && player.y && (
-                        <div className="text-sm text-gray-400">
-                          📍 ({player.x}, {player.y})
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Group justify="space-between">
+                <Stack gap={5}>
+                  <Text size="sm" c="dimmed">Total Players</Text>
+                  <Text size="xl" fw={700}>{allPlayers.length}</Text>
+                </Stack>
+                <Avatar color="violet" radius="xl" size="lg">
+                  <IconDeviceGamepad2 size={24} />
+                </Avatar>
+              </Group>
+            </Card>
+          </Grid.Col>
 
-          {/* Top Players Leaderboard */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6">
-            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-              <span className="text-yellow-400">🏆</span> Top Survivors
-            </h2>
-            {topPlayers.length === 0 ? (
-              <p className="text-gray-400">No player data available</p>
-            ) : (
-              <div className="space-y-3">
-                {topPlayers.map((player, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-gray-900/50 rounded-lg p-4 border border-gray-700 hover:border-yellow-500/50 transition"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`text-2xl font-bold ${
-                            idx === 0
-                              ? 'text-yellow-400'
-                              : idx === 1
-                              ? 'text-gray-300'
-                              : idx === 2
-                              ? 'text-orange-600'
-                              : 'text-gray-500'
-                          }`}
-                        >
-                          #{idx + 1}
-                        </div>
-                        <div>
-                          <div className="font-semibold">{player.username}</div>
-                          <div className="text-sm text-gray-400">{player.deaths} deaths</div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-xl font-bold text-green-400">{player.hours}h</div>
-                        <div className="text-xs text-gray-400">survived</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+          <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Group justify="space-between">
+                <Stack gap={5}>
+                  <Text size="sm" c="dimmed">Map</Text>
+                  <Text size="lg" fw={700}>{serverStatus?.map || 'Unknown'}</Text>
+                </Stack>
+                <Avatar color="teal" radius="xl" size="lg">
+                  <IconMap size={24} />
+                </Avatar>
+              </Group>
+            </Card>
+          </Grid.Col>
 
-        {/* All Players Stats */}
-        <div className="mt-8 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6">
-          <h2 className="text-2xl font-bold mb-4">All Players</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-700">
-                  <th className="text-left py-3 px-4">Player</th>
-                  <th className="text-left py-3 px-4">Hours</th>
-                  <th className="text-left py-3 px-4">Deaths</th>
-                  <th className="text-left py-3 px-4">Last Seen</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.values(playerStats)
-                  .sort((a, b) => b.total_hours - a.total_hours)
-                  .map((player, idx) => (
-                    <tr
-                      key={idx}
-                      className="border-b border-gray-700/50 hover:bg-gray-700/30 transition"
-                    >
-                      <td className="py-3 px-4 font-medium">{player.username}</td>
-                      <td className="py-3 px-4">{player.total_hours}</td>
-                      <td className="py-3 px-4">{player.deaths}</td>
-                      <td className="py-3 px-4 text-sm text-gray-400">
-                        {new Date(player.last_seen).toLocaleString()}
-                      </td>
-                    </tr>
+          <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Group justify="space-between">
+                <Stack gap={5}>
+                  <Text size="sm" c="dimmed">PVP Mode</Text>
+                  <Text size="lg" fw={700}>
+                    {serverStatus?.pvp_enabled ? 'Enabled' : 'Disabled'}
+                  </Text>
+                </Stack>
+                <Avatar color="red" radius="xl" size="lg">
+                  <IconSwords size={24} />
+                </Avatar>
+              </Group>
+            </Card>
+          </Grid.Col>
+        </Grid>
+
+        {/* Online Players & Top Survivors */}
+        <Grid mb="xl">
+          <Grid.Col span={{ base: 12, lg: 6 }}>
+            <Card shadow="sm" padding="lg" radius="md" withBorder style={{ height: '100%' }}>
+              <Group mb="md">
+                <Indicator color="green" processing size={12} />
+                <Title order={3}>Online Players</Title>
+              </Group>
+              <Divider mb="md" />
+              {onlinePlayers.length === 0 ? (
+                <Text c="dimmed">No players currently online</Text>
+              ) : (
+                <Stack gap="sm">
+                  {onlinePlayers.map((player, idx) => (
+                    <Card key={idx} padding="md" radius="sm" withBorder>
+                      <Group justify="space-between">
+                        <Stack gap={2}>
+                          <Text fw={600}>{player.username}</Text>
+                          <Text size="sm" c="dimmed">
+                            Connected: {new Date(player.connected_at).toLocaleTimeString()}
+                          </Text>
+                        </Stack>
+                        {player.x && player.y && (
+                          <Text size="sm" c="dimmed">
+                            📍 ({player.x}, {player.y})
+                          </Text>
+                        )}
+                      </Group>
+                    </Card>
                   ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+                </Stack>
+              )}
+            </Card>
+          </Grid.Col>
+
+          <Grid.Col span={{ base: 12, lg: 6 }}>
+            <Card shadow="sm" padding="lg" radius="md" withBorder style={{ height: '100%' }}>
+              <Group mb="md">
+                <IconTrophy size={24} style={{ color: 'gold' }} />
+                <Title order={3}>Top Survivors</Title>
+              </Group>
+              <Divider mb="md" />
+              {topPlayers.length === 0 ? (
+                <Text c="dimmed">No player data available</Text>
+              ) : (
+                <Stack gap="sm">
+                  {topPlayers.map((player, idx) => (
+                    <Card key={idx} padding="md" radius="sm" withBorder>
+                      <Group justify="space-between">
+                        <Group>
+                          <Badge 
+                            size="xl" 
+                            variant="filled"
+                            color={idx === 0 ? 'yellow' : idx === 1 ? 'gray' : idx === 2 ? 'orange' : 'dark'}
+                          >
+                            #{idx + 1}
+                          </Badge>
+                          <Stack gap={2}>
+                            <Text fw={600}>{player.username}</Text>
+                            <Text size="sm" c="dimmed">{player.deaths} deaths</Text>
+                          </Stack>
+                        </Group>
+                        <Stack gap={0} align="flex-end">
+                          <Text size="xl" fw={700} c="green">
+                            {player.hours}h
+                          </Text>
+                          <Text size="xs" c="dimmed">survived</Text>
+                        </Stack>
+                      </Group>
+                    </Card>
+                  ))}
+                </Stack>
+              )}
+            </Card>
+          </Grid.Col>
+        </Grid>
+
+        {/* All Players Table */}
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Title order={3} mb="md">All Players</Title>
+          <Divider mb="md" />
+          <Table striped highlightOnHover>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Player</Table.Th>
+                <Table.Th>Hours</Table.Th>
+                <Table.Th>Deaths</Table.Th>
+                <Table.Th>Last Seen</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {allPlayers.map((player, idx) => (
+                <Table.Tr key={idx}>
+                  <Table.Td>
+                    <Text fw={500}>{player.username}</Text>
+                  </Table.Td>
+                  <Table.Td>
+                    <Group gap="xs">
+                      <IconClock size={16} />
+                      <Text>{player.total_hours}</Text>
+                    </Group>
+                  </Table.Td>
+                  <Table.Td>{player.deaths}</Table.Td>
+                  <Table.Td>
+                    <Text size="sm" c="dimmed">
+                      {new Date(player.last_seen).toLocaleString()}
+                    </Text>
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Card>
+      </Container>
 
       {/* Footer */}
-      <footer className="mt-12 py-6 border-t border-gray-700 text-center text-gray-400 text-sm">
-        <p>Project Zomboid Server Dashboard • Made with ❤️ for Camp Crew</p>
-      </footer>
-    </main>
-  );
-}
-
-function StatCard({
-  title,
-  value,
-  icon,
-  color,
-}: {
-  title: string;
-  value: string | number;
-  icon: string;
-  color: string;
-}) {
-  return (
-    <div className={`rounded-lg border p-6 ${color} backdrop-blur-sm`}>
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-gray-300 text-sm font-medium">{title}</span>
-        <span className="text-2xl">{icon}</span>
-      </div>
-      <div className="text-3xl font-bold">{value}</div>
-    </div>
+      <Paper p="md" mt="xl" radius={0} withBorder>
+        <Container size="xl">
+          <Text ta="center" size="sm" c="dimmed">
+            Project Zomboid Server Dashboard • Made with ❤️ for Camp Crew
+          </Text>
+        </Container>
+      </Paper>
+    </Box>
   );
 }
