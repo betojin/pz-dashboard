@@ -88,7 +88,7 @@ export default function Home() {
   }
 
   const topPlayers = leaderboard.slice(0, 5);
-  const allPlayers = Object.values(playerStats).sort((a: PlayerStats, b: PlayerStats) => b.total_hours - a.total_hours);
+  const allPlayers = (Object.values(playerStats) as PlayerStats[]).sort((a, b) => b.total_hours - a.total_hours);
 
   return (
     <Box style={{ minHeight: '100vh' }}>
@@ -279,7 +279,7 @@ export default function Home() {
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {allPlayers.map((player: PlayerStats, idx: number) => (
+              {allPlayers.map((player, idx) => (
                 <Table.Tr key={idx}>
                   <Table.Td>
                     <Text fw={500}>{player.username}</Text>
