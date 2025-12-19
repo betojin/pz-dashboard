@@ -31,21 +31,17 @@ export async function fetchServerData<T>(
     apiEndpoint: string,
     fallbackFile: string
 ): Promise<FetchResult<T>> {
-    // Try API first
-    if (API_URL) {
-        try {
-            const response = await fetchWithTimeout(
-                `${API_URL}${apiEndpoint}`,
-                API_TIMEOUT
-            );
+    // Try API via Vercel proxy (solves mixed-content issue)
+    try {
+        const proxyUrl = `/api/proxy?endpoint=${encodeURIComponent(apiEndpoint)}`;
+        const response = await fetchWithTimeout(proxyUrl, API_TIMEOUT);
 
-            if (response.ok) {
-                const data = await response.json();
-                return { data, source: 'api' };
-            }
-        } catch (error) {
-            console.warn(`API fetch failed for ${apiEndpoint}, falling back to static data`);
+        if (response.ok) {
+            const data = await response.json();
+            return { data, source: 'api' };
         }
+    } catch (error) {
+        console.warn(`API fetch failed for ${apiEndpoint}, falling back to static data`);
     }
 
     // Fallback to GitHub static data
