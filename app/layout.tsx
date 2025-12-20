@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { MantineProvider, ColorSchemeScript } from '@mantine/core'
 import '@mantine/core/styles.css'
+import { Footer } from '@/components/footer'
 
 export const metadata: Metadata = {
   title: 'Camp Crew PZ - Server Dashboard',
@@ -15,11 +16,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <ColorSchemeScript defaultColorScheme="dark" />
+        <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider defaultColorScheme="dark">
+        <MantineProvider>
           {children}
+          <Footer />
         </MantineProvider>
       </body>
     </html>

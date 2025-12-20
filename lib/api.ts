@@ -72,6 +72,9 @@ export const fetchServerStatus = () =>
 export const fetchOnlinePlayers = () =>
     fetchServerData('/api/players/online', 'online_players.json');
 
+export const fetchAllPlayerLocations = () =>
+    fetchServerData('/api/players/locations', 'online_players.json');
+
 export const fetchPlayerStats = () =>
     fetchServerData('/api/players/stats', 'player_stats.json');
 
