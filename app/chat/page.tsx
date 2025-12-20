@@ -88,7 +88,7 @@ export default function ChatPage() {
     }
 
     // Sort by timestamp descending (newest first)
-    filtered.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    filtered.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
     setFilteredMessages(filtered);
   }
