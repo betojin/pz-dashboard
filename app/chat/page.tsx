@@ -1,34 +1,36 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { 
-    Container, 
-    Title, 
-    Text, 
-    Card, 
-    Stack,
-    Group,
-    Paper,
-    Box,
-    Badge,
-    ScrollArea,
-    Divider,
-    TextInput
-} from '@mantine/core';
-import { IconMessages, IconSearch, IconFilter } from '@tabler/icons-react';
-import { fetchRecentActivity } from '@/lib/api';
-import type { ChatMessage } from '@/types';
-import Link from 'next/link';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { Navigation } from '@/components/navigation';
+import { useEffect, useState } from "react";
+import {
+  Container,
+  Title,
+  Text,
+  Card,
+  Stack,
+  Group,
+  Paper,
+  Box,
+  Badge,
+  ScrollArea,
+  Divider,
+  TextInput,
+} from "@mantine/core";
+import { IconMessages, IconSearch, IconFilter } from "@tabler/icons-react";
+import { fetchRecentActivity } from "@/lib/api";
+import type { ChatMessage } from "@/types";
+import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Navigation } from "@/components/navigation";
 
 export default function ChatPage() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [filteredMessages, setFilteredMessages] = useState<ChatMessage[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedChatType, setSelectedChatType] = useState<string>('all');
-  const [dataSource, setDataSource] = useState<'api' | 'fallback' | 'loading'>('loading');
-  const [lastUpdate, setLastUpdate] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedChatType, setSelectedChatType] = useState<string>("all");
+  const [dataSource, setDataSource] = useState<"api" | "fallback" | "loading">(
+    "loading"
+  );
+  const [lastUpdate, setLastUpdate] = useState<string>("");
 
   useEffect(() => {
     loadData();
@@ -43,28 +45,28 @@ export default function ChatPage() {
   async function loadData() {
     try {
       const result = await fetchRecentActivity();
-      
+
       if (result.data) {
         const data = result.data as any;
         const messages = (data.chat_messages || []).map((msg: any) => ({
           ...msg,
-          timestamp: parseCustomDate(msg.timestamp)
+          timestamp: parseCustomDate(msg.timestamp),
         }));
         setChatMessages(messages);
-        setDataSource(result.source as 'api' | 'fallback');
+        setDataSource(result.source as "api" | "fallback");
       }
 
       setLastUpdate(new Date().toLocaleTimeString());
     } catch (error) {
-      console.error('Error loading chat data:', error);
+      console.error("Error loading chat data:", error);
     }
   }
 
   function parseCustomDate(dateStr: string): Date {
     // Parse custom format: DD-MM-YY HH:MM:SS.mmm
-    const [datePart, timePart] = dateStr.split(' ');
-    const [day, month, year] = datePart.split('-');
-    const [time] = timePart.split('.');
+    const [datePart, timePart] = dateStr.split(" ");
+    const [day, month, year] = datePart.split("-");
+    const [time] = timePart.split(".");
     const fullYear = `20${year}`;
     const isoDate = `${fullYear}-${month}-${day}T${time}`;
     return new Date(isoDate);
@@ -74,26 +76,33 @@ export default function ChatPage() {
     let filtered = [...chatMessages];
 
     // Filter by chat type
-    if (selectedChatType !== 'all') {
-      filtered = filtered.filter(msg => msg.chat_type === selectedChatType);
+    if (selectedChatType !== "all") {
+      filtered = filtered.filter((msg) => msg.chat_type === selectedChatType);
     }
 
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(msg => 
-        msg.author.toLowerCase().includes(query) ||
-        msg.text.toLowerCase().includes(query)
+      filtered = filtered.filter(
+        (msg) =>
+          msg.author.toLowerCase().includes(query) ||
+          msg.text.toLowerCase().includes(query)
       );
     }
 
     // Sort by timestamp descending (newest first)
-    filtered.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    filtered.sort(
+      (a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
 
     setFilteredMessages(filtered);
   }
 
-  const chatTypes = ['all', ...Array.from(new Set(chatMessages.map(msg => msg.chat_type)))];
+  const chatTypes = [
+    "all",
+    ...Array.from(new Set(chatMessages.map((msg) => msg.chat_type))),
+  ];
 
   return (
     <Box>
@@ -112,7 +121,8 @@ export default function ChatPage() {
               <Group gap="xs">
                 <ThemeToggle />
                 <Text size="xs" c="dimmed">
-                  {dataSource === 'api' ? '🟢 Live Data' : '🟡 Cached Data'} • Updated {lastUpdate}
+                  {dataSource === "api" ? "🟢 Live Data" : "🟡 Cached Data"} •
+                  Updated {lastUpdate}
                 </Text>
               </Group>
               <Badge size="lg" variant="light" color="blue">
@@ -141,12 +151,14 @@ export default function ChatPage() {
               </Group>
               <Group gap="xs">
                 <IconFilter size={16} />
-                <Text size="sm" fw={500}>Chat Type:</Text>
-                {chatTypes.map(type => (
+                <Text size="sm" fw={500}>
+                  Chat Type:
+                </Text>
+                {chatTypes.map((type) => (
                   <Badge
                     key={type}
-                    variant={selectedChatType === type ? 'filled' : 'light'}
-                    style={{ cursor: 'pointer' }}
+                    variant={selectedChatType === type ? "filled" : "light"}
+                    style={{ cursor: "pointer" }}
                     onClick={() => setSelectedChatType(type)}
                   >
                     {type}
@@ -167,22 +179,42 @@ export default function ChatPage() {
                 ) : (
                   filteredMessages.map((msg, idx) => (
                     <Box key={idx}>
-                      <Group justify="space-between" align="flex-start" wrap="nowrap">
+                      <Group
+                        justify="space-between"
+                        align="flex-start"
+                        wrap="nowrap"
+                      >
                         <Stack gap={4} style={{ flex: 1 }}>
                           <Group gap="xs">
-                            <Text fw={600} size="sm">{msg.author}</Text>
+                            <Text fw={600} size="sm">
+                              {msg.author}
+                            </Text>
                             <Badge size="xs" variant="light">
                               {msg.chat_type}
                             </Badge>
                             <Text size="xs" c="dimmed" suppressHydrationWarning>
                               {(() => {
                                 const date = new Date(msg.timestamp);
-                                const month = String(date.getMonth() + 1).padStart(2, '0');
-                                const day = String(date.getDate()).padStart(2, '0');
-                                const year = String(date.getFullYear()).slice(-2);
-                                const hours = String(date.getHours()).padStart(2, '0');
-                                const minutes = String(date.getMinutes()).padStart(2, '0');
-                                const seconds = String(date.getSeconds()).padStart(2, '0');
+                                const month = String(
+                                  date.getMonth() + 1
+                                ).padStart(2, "0");
+                                const day = String(date.getDate()).padStart(
+                                  2,
+                                  "0"
+                                );
+                                const year = String(date.getFullYear()).slice(
+                                  -2
+                                );
+                                const hours = String(date.getHours()).padStart(
+                                  2,
+                                  "0"
+                                );
+                                const minutes = String(
+                                  date.getMinutes()
+                                ).padStart(2, "0");
+                                const seconds = String(
+                                  date.getSeconds()
+                                ).padStart(2, "0");
                                 return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
                               })()}
                             </Text>

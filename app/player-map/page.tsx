@@ -167,11 +167,10 @@ export default function OnlinePlayersPage() {
               <Stack align="center" gap="md">
                 <IconUser size={48} opacity={0.5} />
                 <Title order={3} c="dimmed">
-                  No players online
+                  No player data available
                 </Title>
                 <Text c="dimmed" ta="center">
-                  When players join the server, their locations will appear on
-                  the map
+                  Player locations will appear here once data is available
                 </Text>
               </Stack>
             </Card>
